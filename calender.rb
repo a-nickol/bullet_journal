@@ -15,7 +15,7 @@ class Date
   end
 end
 
-quartal = 2
+quartal = 3
 year = 2017
 
 start_year = Date.new(year, ((quartal - 1) * 3) + 1, 1).cwyear

@@ -7,7 +7,6 @@ GEM
       pdf-core (~> 0.7.0)
       ttfunk (~> 1.5)
     ttfunk (1.5.0)
-    week_of_month (1.2.3.4)
 
 PLATFORMS
   ruby
@@ -15,7 +14,6 @@ PLATFORMS
 DEPENDENCIES
   holidays
   prawn
-  week_of_month
 
 BUNDLED WITH
    1.14.3
