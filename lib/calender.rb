@@ -6,10 +6,9 @@ require 'holidays/core_extensions/date'
 require_relative "date_extension.rb"
 require_relative "month_overview.rb"
 
-$lower_part = 40
-$upper_part = 50
-$padding_row = 12
-$number_of_horizontal_lines = 12
+$gray = '555555'
+$black = '000000'
+$header_position = 495
 
 class Calender
   include MonthOverview
@@ -83,6 +82,9 @@ class Calender
 
     @document = Prawn::Document.new(page_layout: :portrait, page_size: "A5")
 
+    @width = bounds.bottom_right[0]
+    @height = bounds.top_left[1]
+
     font_families.update("Roboto" => {
       :normal => 'fonts/Roboto-Regular.ttf',
       :bold => 'fonts/Roboto-Bold.ttf',
@@ -92,14 +94,10 @@ class Calender
     font "Roboto"
     font_size 12
 
-    width = bounds.bottom_right[0]
-    height = bounds.top_left[1]
-
-    new_page(false, true, @start_date)
+    setup_page(true, @start_date)
 
     page = 0
     num = 0
-    next_page = false
 
     generate_todos
     generate_dates
@@ -113,9 +111,11 @@ class Calender
       if num % 5 == (page % 2 == 0 ? 3 : 2)
         page = page + 1
         num = 0
-        new_page(true, page % 2 == 0, date)
+        start_new_page
+        setup_page(page % 2 == 0, date)
       end
 
+=begin
       translate(num * width / 3, 465) do
         feiertag = ""
         if date.holiday?(:de_he)
@@ -138,48 +138,61 @@ class Calender
           end
         end
       end
+=end
 
       num = num + 1
     end
-
     save_as output
   end
 
-  def new_page(new_page, page_even, date)
-    width = bounds.bottom_right[0]
-    height = bounds.top_left[1]
+  def header page_even, date
+    stroke_color $gray
+    stroke_horizontal_line 0, @width, :at => $header_position
 
-    if new_page
-      start_new_page
-    end
-
-    # stroke_axis
-    stroke_color '999999'
-    stroke do
-      horizontal_line 0, width, :at => 505
-      horizontal_line 0, width, :at => $lower_part
-      (0..(page_even ? 2 : 1)).each do |i|
-        (0..$number_of_horizontal_lines).each do |j|
-          start_x = i * width / 3
-          start_y = $lower_part
-          height_y = height - start_y - $upper_part
-          horizontal_line start_x + $padding_row / 2, start_x + (width / 3) - $padding_row, :at => start_y + j * height_y / $number_of_horizontal_lines
-        end
-      end
-    end
-    stroke_color '000000'
+    stroke_color $black
     if (page_even)
-      text_box "#{date.year.to_s} #{date.monthname}", :at => bounds.top_left, :width => width, :align => :left, :style => :bold
-      text_box "KW #{date.cweek}", :at => [width - width / 3, height], :width => width / 3, :align => :right
-      text_box "Hightlight der Woche", :at => [10, $lower_part - 5], :width => width / 3, :align => :left, size: 8
+      text_box "#{date.year.to_s} #{date.monthname}", :at => [0, $header_position + 20], :width => @width, :align => :left, :style => :bold
     else
-      text_box "#{(date).monthname} #{(date).year.to_s}", :at => bounds.top_left, :width => width, :align => :right, :style => :bold
-      text_box "Notizen", :at => [width - width / 3 - 10, 500], :width => width / 3, :align => :right, size: 8
-      text_box "Sonstige Aufgaben", :at => [width - width / 3 - 10, $lower_part - 5], :width => width / 3, :align => :right, size: 8
-      text_box "Ziel der Woche", :at => [width - width / 3 - 10, 260], :width => width / 3, :align => :right, size: 8
+      text_box "#{(date).monthname} #{(date).year.to_s}", :at => [0, $header_position + 20], :width => @width, :align => :right, :style => :bold
+    end
+  end
 
-      print_month(date, 0, 120, date)
-      print_month(date >> 1, 0, 50, date)
+  def setup_page(page_even, date)
+    # stroke_axis
+
+    header page_even, date
+
+    month_width = 80
+    month_height = 50
+
+    if (page_even)
+      padding_y = 5
+      translate(@width - month_width, @height - padding_y) do
+        print_month(date, date, month_width, month_height)
+      end
+    else
+      stroke_color $gray
+      stroke_horizontal_line 0, @width, :at => @height / 2
+      stroke_vertical_line @height / 4, @height / 2, :at => @width / 2
+      stroke_horizontal_line 0, @width, :at => @height / 4
+
+      stroke_color $black
+      font_size = 8
+      align = :right
+      padding_x = 10
+      padding_y = 5
+      x = @width - @width / 3 - padding_x
+      width = @width / 3
+
+      text_box "Notizen"              , :at => [x         , $header_position - padding_y]         , :width => width , :align => align , size: font_size
+      text_box "Aufgaben"             , :at => [x         , @height / 4 - padding_y] , :width => width , :align => align , size: font_size
+
+      text_box "Ziel der Woche"       , :at => [padding_x , @height / 2 - padding_y] , :width => width , :align => :left , size: font_size
+      text_box "Hightlight der Woche" , :at => [x         , @height / 2 - padding_y] , :width => width , :align => align , size: font_size
+
+      translate(0, @height - padding_y) do
+        print_month(date >> 1, date, month_width, month_height)
+      end
     end
   end
 end

@@ -1,5 +1,5 @@
 module MonthOverview
-  def print_month(date, x, y, highlight_week)
+  def print_month(date, highlight_week, width, height)
     start_date = Date.new(date.year, date.month, 1)
     end_date = Date.new(date.year, date.month, -1)
 
@@ -14,14 +14,11 @@ module MonthOverview
 
     size = 6
 
-    height = 60
-    width = bounds.bottom_right[0]
-    month_width = width / 3
-    cell_width = month_width / (weeks  + 1)
+    cell_width = width / (weeks  + 1)
 
-    translate(width - month_width, y) do
-      formatted_text_box [ { text: "#{date.monthname}", styles: [:bold] }
-      ], :at => [0, height + 4], :width => month_width, :align => :center, size: size + 1
+    translate 0, -20 do
+
+      formatted_text_box [ { text: "#{date.monthname}", styles: [:bold] } ], :at => [0, height + 4], :width => width, :align => :center, size: size + 1
 
       ["KW", "MO", "DI", "MI", "DO", "FR", "SA", "SO"].each_with_index do |s, i|
         formatted_text_box [ { text: s, styles: [:bold] }
