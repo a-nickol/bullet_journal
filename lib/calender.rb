@@ -1,4 +1,5 @@
 require "prawn"
+require "prawn/measurement_extensions"
 require "date"
 require 'pry-byebug'
 require 'holidays'
@@ -94,14 +95,14 @@ class Calender
     font "Roboto"
     font_size 12
 
+    generate_dates
+    generate_reorder_dates
+    generate_todos
+
     setup_page(true, @start_date)
 
     page = 0
     num = 0
-
-    generate_todos
-    generate_dates
-    generate_reorder_dates
 
     @reorder_dates.each do |date|
       if [0, 6].include?(date.wday)
@@ -114,31 +115,6 @@ class Calender
         start_new_page
         setup_page(page % 2 == 0, date)
       end
-
-=begin
-      translate(num * width / 3, 465) do
-        feiertag = ""
-        if date.holiday?(:de_he)
-          feiertag = " Feiertag"
-        end
-        formatted_text_box [ { text: "#{date.strftime'%d'}", styles: [:bold] },
-                             { text: " #{date.dayname}", size: 8 },
-                             { text: feiertag, size: 6, styles: [:italic] }
-        ], :at => [6, 30], :width => width / 3, :align => :left
-      end
-
-      if @todos[date]
-        @todos[date].each_with_index do |todo, i|
-          start_y = $lower_part
-          height_y = height - start_y - $upper_part
-          translate(num * width / 3 + 20, start_y + i * height_y / $number_of_horizontal_lines - 6 ) do
-            stroke_circle [0, 24], 3
-            formatted_text_box [ { text: todo },
-            ], :at => [6, 30], :width => width / 3, :align => :left, :size => 10
-          end
-        end
-      end
-=end
 
       num = num + 1
     end
@@ -157,18 +133,82 @@ class Calender
     end
   end
 
+  def dotted_background
+    fill_color $gray
+    x = 0
+    while x < bounds.width
+      y = 0
+      while y < bounds.height
+        fill_circle [x, y], 0.5
+        y += 5.mm
+      end
+      x += 5.mm
+    end
+    fill_color $black
+  end
+
+  def create_grid x, y
+    x.times do |i|
+      y.times do |j|
+        bounding_box([bounds.width / x * i, bounds.height / y * (j + 1)], :width => bounds.width / x, :height => bounds.height / y ) do
+          yield i, j
+        end
+      end
+    end
+  end
+
   def setup_page(page_even, date)
     # stroke_axis
 
     header page_even, date
 
+    bounding_box([0, $header_position], :width => @width, :height => $header_position ) do
+      dotted_background
+    end
+
     month_width = 80
     month_height = 50
 
     if (page_even)
+      padding_x = 0
       padding_y = 5
       translate(@width - month_width, @height - padding_y) do
         print_month(date, date, month_width, month_height)
+      end
+
+      5.times do |i|
+        current_date = date + i
+        h = $header_position / 5
+        offset = i * h
+        bounding_box([padding_x, $header_position - padding_y - offset], :width => @width - padding_x * 2, :height => h ) do
+          indent 5 do
+            feiertag = ""
+            if current_date.holiday?(:de_he)
+              feiertag = " Feiertag"
+            end
+            formatted_text_box [ { text: "#{current_date.strftime'%d'}", styles: [:bold] },
+                                 { text: " #{current_date.dayname}", size: 8 },
+                                 { text: feiertag, size: 6, styles: [:italic] } ]
+          end
+
+
+          create_grid 3, 4 do |x, y|
+            index = (y + (2 - x) * 4)
+            if @todos[current_date]
+              todo = @todos[current_date][index]
+              if todo
+                stroke_circle [0, 19], 3
+                indent 15 do
+                  text todo
+                end
+              end
+            end
+          end
+
+          stroke_color $gray
+          stroke_horizontal_line 0, bounds.width, :at => 5 if i != 4
+          # stroke_bounds
+        end
       end
     else
       stroke_color $gray
@@ -185,7 +225,7 @@ class Calender
       width = @width / 3
 
       text_box "Notizen"              , :at => [x         , $header_position - padding_y]         , :width => width , :align => align , size: font_size
-      text_box "Aufgaben"             , :at => [x         , @height / 4 - padding_y] , :width => width , :align => align , size: font_size
+      text_box "Sonstige Aufgaben"             , :at => [x         , @height / 4 - padding_y] , :width => width , :align => align , size: font_size
 
       text_box "Ziel der Woche"       , :at => [padding_x , @height / 2 - padding_y] , :width => width , :align => :left , size: font_size
       text_box "Hightlight der Woche" , :at => [x         , @height / 2 - padding_y] , :width => width , :align => align , size: font_size
