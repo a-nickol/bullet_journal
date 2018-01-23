@@ -1,18 +1,19 @@
+require "date"
 require "prawn"
 require "prawn/measurement_extensions"
-require "date"
-require 'pry-byebug'
 require 'holidays'
 require 'holidays/core_extensions/date'
+require 'pry-byebug'
+require_relative "calender/constants.rb"
+require_relative "calender/month_overview.rb"
 require_relative "date_extension.rb"
-require_relative "month_overview.rb"
-
-$gray = '555555'
-$black = '000000'
-$header_position = 495
+require_relative "prawn/extensions.rb"
 
 class Calender
   include MonthOverview
+  include Grid
+  include Background
+  include Constants
   include Prawn::View
 
   def initialize
@@ -133,37 +134,16 @@ class Calender
     end
   end
 
-  def dotted_background
-    fill_color $gray
-    x = 0
-    while x < bounds.width
-      y = 0
-      while y < bounds.height
-        fill_circle [x, y], 0.5
-        y += 5.mm
-      end
-      x += 5.mm
-    end
-    fill_color $black
-  end
-
-  def create_grid x, y
-    x.times do |i|
-      y.times do |j|
-        bounding_box([bounds.width / x * i, bounds.height / y * (j + 1)], :width => bounds.width / x, :height => bounds.height / y ) do
-          yield i, j
-        end
-      end
-    end
-  end
-
   def setup_page(page_even, date)
     # stroke_axis
 
-    header page_even, date
-
-    bounding_box([0, $header_position], :width => @width, :height => $header_position ) do
-      dotted_background
+    horizontal_split $header_position do
+      top do
+        header page_even, date
+      end
+      bottom do
+        dotted_background
+      end
     end
 
     month_width = 80
@@ -190,7 +170,6 @@ class Calender
                                  { text: " #{current_date.dayname}", size: 8 },
                                  { text: feiertag, size: 6, styles: [:italic] } ]
           end
-
 
           create_grid 3, 4 do |x, y|
             index = (y + (2 - x) * 4)
