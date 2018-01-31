@@ -4,16 +4,17 @@ require "prawn/measurement_extensions"
 require 'holidays'
 require 'holidays/core_extensions/date'
 require 'pry-byebug'
-require_relative "calender/constants.rb"
-require_relative "calender/month_overview.rb"
+require_relative "calendar/constants.rb"
+require_relative "calendar/month_overview.rb"
 require_relative "date_extension.rb"
 require_relative "prawn/extensions.rb"
 
-class Calender
+class Calendar
   include MonthOverview
   include Grid
   include Background
   include Constants
+  include Split
   include Prawn::View
 
   def initialize
@@ -137,11 +138,11 @@ class Calender
   def setup_page(page_even, date)
     # stroke_axis
 
-    horizontal_split $header_position do
-      top do
+    horizontal_split $header_position do |split|
+      split.top do
         header page_even, date
       end
-      bottom do
+      split.bottom do
         dotted_background
       end
     end
