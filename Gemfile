@@ -1,6 +1,3 @@
-source 'https://rubygems.org'
+source "http://www.rubygems.org"
 
-gem 'prawn'
-gem 'holidays'
-gem 'thor'
-gem 'pry-byebug'
+gemspec
