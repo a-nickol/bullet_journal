@@ -6,7 +6,6 @@ require 'prawn/measurement_extensions'
 require 'holidays'
 require 'holidays/core_extensions/date'
 
-require 'bullet_journal/constants'
 require 'bullet_journal/month_overview'
 
 require_relative 'bullet_journal/ext/date'
@@ -17,11 +16,56 @@ module BulletJournal
     include MonthOverview
     include Grid
     include Background
-    include Constants
     include Split
     include Prawn::View
 
     def initialize; end
+
+    public
+
+    def calendar(start_date, end_date, layout, output)
+      @start_date = start_date
+      @end_date = end_date
+
+      @document = Prawn::Document.new(page_layout: :portrait, page_size: 'A5')
+
+      @width = bounds.bottom_right[0]
+      @height = bounds.top_left[1]
+
+      font_families.update('Roboto' => {
+        normal: 'data/fonts/Roboto-Regular.ttf',
+        bold: 'data/fonts/Roboto-Bold.ttf',
+        italic: 'data/fonts/Roboto-Italic.ttf'
+      })
+
+      font 'Roboto'
+      font_size 12
+
+      generate_dates
+      generate_reorder_dates
+      generate_todos
+
+      setup_page(true, @start_date)
+
+      page = 0
+      num = 0
+
+      @reorder_dates.each do |date|
+        next if [0, 6].include?(date.wday)
+
+        if num % 5 == (page.even? ? 3 : 2)
+          page += 1
+          num = 0
+          start_new_page
+          setup_page(page.even?, date)
+        end
+
+        num += 1
+      end
+      save_as output
+    end
+
+    private
 
     def generate_reorder_dates
       @reorder_dates = @dates[0..13]
@@ -64,54 +108,6 @@ module BulletJournal
 
         last_date = date
       end
-    end
-
-    def calendar(year, quarter, output)
-      start_year = Date.new(year, ((quarter - 1) * 3) + 1, 1).cwyear
-      start_week = Date.new(year, ((quarter - 1) * 3) + 1, 1).cweek
-
-      end_year = Date.new(year, quarter * 3, -1).cwyear
-      end_week = Date.new(year, quarter * 3, -1).cweek
-
-      @start_date = Date.commercial(start_year, start_week, 1)
-      @end_date = Date.commercial(end_year, end_week, 5)
-
-      @document = Prawn::Document.new(page_layout: :portrait, page_size: 'A5')
-
-      @width = bounds.bottom_right[0]
-      @height = bounds.top_left[1]
-
-      font_families.update('Roboto' => {
-                             normal: 'fonts/Roboto-Regular.ttf',
-                             bold: 'fonts/Roboto-Bold.ttf',
-                             italic: 'fonts/Roboto-Italic.ttf'
-                           })
-
-      font 'Roboto'
-      font_size 12
-
-      generate_dates
-      generate_reorder_dates
-      generate_todos
-
-      setup_page(true, @start_date)
-
-      page = 0
-      num = 0
-
-      @reorder_dates.each do |date|
-        next if [0, 6].include?(date.wday)
-
-        if num % 5 == (page.even? ? 3 : 2)
-          page += 1
-          num = 0
-          start_new_page
-          setup_page(page.even?, date)
-        end
-
-        num += 1
-      end
-      save_as output
     end
 
     def header(page_even, date)
