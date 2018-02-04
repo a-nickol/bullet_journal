@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BulletJournal
   class Proxy < BasicObject
     def initialize(recorder)
@@ -5,7 +7,8 @@ module BulletJournal
     end
 
     private
-    def method_missing(method, *args, &block)
+
+    def method_missing(method, *_args, &block)
       @recorder[method] = block
     end
   end

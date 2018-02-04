@@ -1,15 +1,15 @@
+# frozen_string_literal: true
+
 header_position = 100
 
 define_templates do |define|
-  define.day do |day|
+  define.day do |_day|
     indent 5 do
-      feiertag = ""
-      if current_date.holiday?(:de_he)
-        feiertag = " Feiertag"
-      end
-      formatted_text_box [ { text: "#{current_date.strftime'%d'}", styles: [:bold] },
-                           { text: " #{current_date.dayname}", size: 8 },
-                           { text: feiertag, size: 6, styles: [:italic] } ]
+      feiertag = ''
+      feiertag = ' Feiertag' if current_date.holiday?(:de_he)
+      formatted_text_box [{ text: (current_date.strftime '%d').to_s, styles: [:bold] },
+                          { text: " #{current_date.dayname}", size: 8 },
+                          { text: feiertag, size: 6, styles: [:italic] }]
     end
 
     create_grid 3, 4 do |x, y|
@@ -26,23 +26,23 @@ define_templates do |define|
     end
 
     stroke_color $gray
-    stroke_horizontal_line 0, bounds.width, :at => 5 if i != 4
+    stroke_horizontal_line 0, bounds.width, at: 5 if i != 4
   end
 
   define.header do |orientation|
     stroke_color $gray
-    stroke_horizontal_line 0, @width, :at => $header_position
+    stroke_horizontal_line 0, @width, at: $header_position
 
     stroke_color $black
-    if (orientation == :left)
-      text_box "#{date.year.to_s} #{date.monthname}", :at => [0, $header_position + 20], :width => @width, :align => :left, :style => :bold
+    if orientation == :left
+      text_box "#{date.year} #{date.monthname}", at: [0, $header_position + 20], width: @width, align: :left, style: :bold
     else
-      text_box "#{(date).monthname} #{(date).year.to_s}", :at => [0, $header_position + 20], :width => @width, :align => :right, :style => :bold
+      text_box "#{date.monthname} #{date.year}", at: [0, $header_position + 20], width: @width, align: :right, style: :bold
     end
   end
 
   define.box do |orientation, text|
-    text_box text, :at => [0, 0] , :heigth => heigth, :width => width , :align => orientation, size: 9
+    text_box text, at: [0, 0], heigth: heigth, width: width, align: orientation, size: 9
   end
 end
 
@@ -54,7 +54,7 @@ layout do |layout|
       end
       s.bottom do
         dotted_background
-        grid 1, 5 do |x, y|
+        grid 1, 5 do |_x, y|
           case y
           when 0
             monday
@@ -81,7 +81,7 @@ layout do |layout|
         dotted_background
         split_horizontal percent: 50 do |s|
           s.top do
-            template :box, :right, "Notizen"
+            template :box, :right, 'Notizen'
             border :bottom_left, :bottom_right
           end
           s.bottom do
@@ -89,17 +89,17 @@ layout do |layout|
               s.top do
                 split_vertical percent: 50 do |s|
                   s.left do
-                    template :box, :left, "Ziel der Woche"
+                    template :box, :left, 'Ziel der Woche'
                     border :top_right, :bottom_right
                   end
                   s.right do
-                    template :box, :right, "Hightlight der Woche"
+                    template :box, :right, 'Hightlight der Woche'
                   end
                 end
                 border :bottom_left, :bottom_right
               end
               s.bottom do
-                template :box, :right, "Sonstige Aufgaben"
+                template :box, :right, 'Sonstige Aufgaben'
               end
             end
           end

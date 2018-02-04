@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Constants
   $gray = '555555'
   $black = '000000'

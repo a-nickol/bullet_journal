@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Background
   def dotted_background
     fill_color $gray
@@ -13,4 +15,3 @@ module Background
     fill_color $black
   end
 end
-

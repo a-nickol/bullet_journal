@@ -1,14 +1,15 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-require "thor"
-require "bullet_journal"
+require 'thor'
+require 'bullet_journal'
 
 module BulletJournal
   class BulletJournalCLI < Thor
-    desc "calendar YEAR QUARTER", "creates a printable bullet journal calendar"
+    desc 'calendar YEAR QUARTER', 'creates a printable bullet journal calendar'
     def calendar(year, quarter)
       c = BulletJournal.new
-      c.calendar(year, quarter, "calendar.pdf")
+      c.calendar(year, quarter, 'calendar.pdf')
     end
 
     default_task :calendar
