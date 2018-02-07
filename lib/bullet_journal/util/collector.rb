@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BulletJournal
-  class Proxy < BasicObject
+  class CollectorProxy < BasicObject
     def initialize(recorder)
       @recorder = recorder
     end
@@ -18,8 +18,9 @@ module BulletJournal
       @recorder = {}
     end
 
-    def record_methods
-      Proxy.new @recorder
+    def record_block block
+      proxy = CollectorProxy.new @recorder
+      proxy.instance_eval &block
     end
 
     def recorded_methods

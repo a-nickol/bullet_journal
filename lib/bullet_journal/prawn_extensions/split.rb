@@ -4,13 +4,13 @@ require 'bullet_journal/util/collector'
 
 module BulletJournal
   module Split
-    def horizontal_split(_position)
+    def horizontal_split(position, options = {}, &block)
       collector = Collector.new
-      yield collector.record_methods
-      bounding_box([0, $header_position], width: @width, height: $header_position) do
+      collector.record_block block
+      bounding_box([0, position], width: @width, height: @height - position) do
         collector.recorded_methods[:top].call
       end
-      bounding_box([0, $header_position], width: @width, height: $header_position) do
+      bounding_box([0, 0], width: @width, height: position) do
         collector.recorded_methods[:bottom].call
       end
     end
