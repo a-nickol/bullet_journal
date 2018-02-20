@@ -19,8 +19,11 @@ module BulletJournal
     end
 
     def record_block block
+      if block.nil?
+        raise Exception.new
+      end
       proxy = CollectorProxy.new @recorder
-      proxy.instance_eval &block
+      proxy.instance_eval(&block)
     end
 
     def recorded_methods

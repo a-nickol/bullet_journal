@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 group :red_green_refactor, halt_on_fail: true do
   guard :minitest do
     watch(%r{^test/(.*)\/?test_(.*)\.rb$})
@@ -5,10 +7,9 @@ group :red_green_refactor, halt_on_fail: true do
     watch(%r{^test/test_helper\.rb$})      { 'test' }
   end
 
-  guard :rubocop do
-    watch(%r{.+\.rb$})
+  guard :rubocop, cli: '--cache false' do
+    watch(/.+\.rb$/)
+    watch(/.+\.gemspec$/)
     watch(%r{(?:.+/)?\.rubocop(?:_todo)?\.yml$}) { |m| File.dirname(m[0]) }
   end
-
 end
-

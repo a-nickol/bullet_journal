@@ -1,4 +1,4 @@
-# frozen_string_literal: tru
+# frozen_string_literal: true
 
 Gem::Specification.new do |s|
   s.name     = 'bullet_journal'
@@ -12,8 +12,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'prawn'
   s.add_runtime_dependency 'thor'
 
-  s.add_development_dependency 'rubocop'
   s.add_development_dependency 'guard'
   s.add_development_dependency 'guard-minitest'
   s.add_development_dependency 'guard-rubocop'
+  s.add_development_dependency 'rubocop'
 end
