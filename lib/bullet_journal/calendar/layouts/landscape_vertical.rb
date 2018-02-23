@@ -49,21 +49,23 @@ module BulletJournal
         end
       end
 
-      stroke_color @gray
+      stroke_color GRAY
       stroke_horizontal_line 0, bounds.width, at: 5 if i != 4
     end
 
     def header(orientation)
-      stroke_color @gray
-      stroke_horizontal_line 0, width, at: @header_position
+      stroke_color GRAY
+      stroke_horizontal_line 0, width, at: HEADER_POSITION
 
-      stroke_color @black
+      date = @current_week[0]
+
+      stroke_color BLACK
       if orientation == :left
-        text_box "#{date.year} #{date.monthname}", at: [0, @header_position + 20],
+        text_box "#{date.year} #{date.monthname}", at: [0, HEADER_POSITION + 20],
           width: width, align: :left,
           style: :bold
       else
-        text_box "#{date.monthname} #{date.year}", at: [0, @header_position + 20],
+        text_box "#{date.monthname} #{date.year}", at: [0, HEADER_POSITION + 20],
           width: width, align: :right,
           style: :bold
       end

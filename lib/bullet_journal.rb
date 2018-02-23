@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'pry'
+
 require 'bullet_journal/version'
 
 require 'bullet_journal/cli'

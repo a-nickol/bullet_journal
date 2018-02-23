@@ -8,7 +8,7 @@ module BulletJournal
 
     def split_horizontal(position, options = {}, &block)
       collector = Collector.new
-      collector.record_block block
+      collector.record_block(&block)
       bounding_box([0, position], width: width, height: height - position) do
         collector.recorded_methods[:top].call
       end
@@ -19,7 +19,7 @@ module BulletJournal
 
     def split_vertical(position, options = {}, &block)
       collector = Collector.new
-      collector.record_block block
+      collector.record_block(&block)
       bounding_box([0, 0], width: position) do
         collector.recorded_methods[:left].call
       end

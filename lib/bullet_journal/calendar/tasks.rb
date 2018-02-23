@@ -12,9 +12,9 @@ module BulletJournal
     end
 
     def initialize(date_range)
-      initialize_date_range(date_range)
+      date_range = initialize_date_range(date_range)
       initialize_tasks
-      generate_tasks
+      generate_tasks date_range
     end
 
     def [](date)
@@ -23,82 +23,58 @@ module BulletJournal
 
     private
 
-    attr_reader :current_date
-    attr_reader :last_date
-
     def initialize_date_range(date_range)
-      @date_range = date_range.sort
-      add_days_at_front(7)
+      date_range = date_range.sort
+      add_days_at_front(date_range, 7)
     end
 
     def initialize_tasks
       @tasks = Hash.new { |h, k| h[k] = [] }
     end
 
-    def add_days_at_front(days)
-      days.times { @date_range.unshift(@date_range.first - 1) }
+    def add_days_at_front(date_range, days)
+      days.times { date_range.unshift(date_range.first - 1) }
+      date_range
     end
 
-    def generate_tasks
-      @date_range.each do |date|
-        next if rest_day?(date)
-        @current_date = date
-        generate_task unless @last_date.nil?
-        @last_date = date
+    def generate_tasks(date_range)
+      date_range = date_range.reject { |date| rest_day?(date) }
+      date_range.each_cons(2) do |last_date, date|
+        generate_task last_date, date
       end
     end
 
-    def generate_task
-      daily_task
-      weekly_task if week_changed
-      monthly_task if month_changed
+    def generate_task(last_date, date)
+      daily_task date
+      weekly_task if week_changed last_date, date
+      monthly_task if month_changed last_date, date
     end
 
-    def last_week
-      @last_date.cweek
+    def week_changed(date1, date2)
+      date1.cweek != date2.cweek
     end
 
-    def last_month
-      @last_date.month
+    def month_changed(date1, date2)
+      date1.month != date2.month
     end
 
-    def current_week
-      @current_date.cweek
+    def daily_task(date)
+      add_task(date, 'Stundenzettel')
     end
 
-    def current_month
-      @current_date.month
+    def weekly_task(date)
+      add_task(date, 'Wochenplanung')
     end
 
-    def week_changed
-      current_week != last_week
+    def monthly_task(last_date, date)
+      add_task(last_date, 'RPME')
+      add_task(date, 'Monatsbericht')
+      add_task(date, 'Monatsplanung')
+      add_task(date, 'Quartalsplanung') if date.month % 3 == 1
     end
 
-    def month_changed
-      current_month != last_month
-    end
-
-    def daily_task
-      add_task('Stundenzettel')
-    end
-
-    def weekly_task
-      add_task('Wochenplanung')
-    end
-
-    def monthly_task
-      add_task_for_previous_day 'RPME'
-      add_task 'Monatsbericht'
-      add_task 'Monatsplanung'
-      add_task 'Quartalsplanung' if @current_date.month % 3 == 1
-    end
-
-    def add_task(task)
-      @tasks[@current_date].push(task)
-    end
-
-    def add_task_for_previous_day(task)
-      @tasks[@last_date].push(task)
+    def add_task(date, task)
+      @tasks[date].push(task)
     end
   end
 end

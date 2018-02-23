@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 module BulletJournal
+  ##
+  # Class which records all methods calls.
+  #
   class CollectorProxy < BasicObject
     def initialize(recorder)
       @recorder = recorder
@@ -8,22 +11,27 @@ module BulletJournal
 
     private
 
-    def method_missing(method, *_args, &block)
+    def method_missing(method, *_args, &block) # rubocop:disable Style/MethodMissing
       @recorder[method] = block
+    end
+
+    def respond_to_missing?(method_name, include_private = false)
+      true
     end
   end
 
+  ##
+  # The Collector records a block given and is able to playback the
+  # called methods.
+  #
   class Collector
     def initialize
       @recorder = {}
     end
 
-    def record_block block
-      if block.nil?
-        raise Exception.new
-      end
+    def record_block
       proxy = CollectorProxy.new @recorder
-      proxy.instance_eval(&block)
+      yield proxy
     end
 
     def recorded_methods

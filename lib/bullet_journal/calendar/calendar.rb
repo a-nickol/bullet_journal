@@ -80,8 +80,8 @@ module BulletJournal
     end
 
     def initialize_dates(start_date, end_date)
+      start_date -= 4 if duplex_print?
       @start_date = start_date
-      @start_date -= 4 if duplex_print?
       @end_date = end_date
       @dates = (start_date..end_date).to_a
       ensure_fortnight
@@ -98,8 +98,8 @@ module BulletJournal
     def reorder_dates_for_duplex_printing
       reorder_dates = []
       @dates.each_slice(14) do |slice|
-        reorder_dates.push(slice[4..-1])
-        reorder_dates.push(slice[0..3])
+        reorder_dates.push(*slice[4..-1])
+        reorder_dates.push(*slice[0..3])
       end
       @dates = reorder_dates
     end
