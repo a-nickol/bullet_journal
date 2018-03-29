@@ -10,6 +10,7 @@ module BulletJournal
   class Calendar
     include Prawn::View
     include Colors
+    include DateHelper
 
     def initialize(start_date, end_date)
       initialize_pdf_document

@@ -11,11 +11,13 @@ module BulletJournal
 
     private
 
-    def method_missing(method, *_args, &block) # rubocop:disable Style/MethodMissing
+    # rubocop:disable Style/MethodMissing
+    def method_missing(method, *_args, &block)
       @recorder[method] = block
     end
+    # rubocop:enable Style/MethodMissing
 
-    def respond_to_missing?(method_name, include_private = false)
+    def respond_to_missing?(_method_name, _include_private = false)
       true
     end
   end
@@ -25,8 +27,9 @@ module BulletJournal
   # called methods.
   #
   class Collector
-    def initialize
+    def initialize(&block)
       @recorder = {}
+      record_block(&block) if block
     end
 
     def record_block

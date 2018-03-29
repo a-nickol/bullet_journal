@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module BulletJournal
-
   ##
   # This layout is specially designed for left handed writers. The bullet journal
   # is used in "landscape mode" with a split design. There are vertical fields on
@@ -61,11 +60,11 @@ module BulletJournal
 
       stroke_color BLACK
       if orientation == :left
-        text_box "#{date.year} #{date.monthname}", at: [0, HEADER_POSITION + 20],
+        text_box "#{date.year} #{month_name(date)}", at: [0, HEADER_POSITION + 20],
           width: width, align: :left,
           style: :bold
       else
-        text_box "#{date.monthname} #{date.year}", at: [0, HEADER_POSITION + 20],
+        text_box "#{month_name(date)} #{date.year}", at: [0, HEADER_POSITION + 20],
           width: width, align: :right,
           style: :bold
       end
@@ -73,11 +72,15 @@ module BulletJournal
 
     def box(orientation, text)
       font_size 9
-      text_box text, at: [0, 0], width: width, heigth: heigth, align: orientation
+      text_box text, at: [0, 0], width: width, heigth: height, align: orientation
+    end
+
+    def border(from, to)
+      stroke_line bounds.send(from), bounds.send(to)
     end
 
     def layout_left_page
-      split_horizontal HEADER_POSITION do |split|
+      split_horizontal at: HEADER_POSITION do |split|
         split.top do
           header :left
         end
@@ -102,7 +105,7 @@ module BulletJournal
     end
 
     def layout_right_page
-      split_horizontal HEADER_POSITION do |split|
+      split_horizontal at: HEADER_POSITION do |split|
         split.top do
           header :right
         end
@@ -114,28 +117,28 @@ module BulletJournal
 
     def layout_right_bottom
       dotted_background
-      split_horizontal percent: 50 do
-        top do
-          template :box, :right, 'Notizen'
+      split_horizontal percent: 50 do |split|
+        split.top do
+          box :right, 'Notizen'
           border :bottom_left, :bottom_right
         end
-        bottom do
-          split_horizontal percent: 50 do
-            top do
+        split.bottom do
+          split_horizontal percent: 50 do |split|
+            split.top do
               split_vertical percent: 50
               left do
-                template :box, :left, 'Ziel der Woche'
+                box :left, 'Ziel der Woche'
                 border :top_right, :bottom_right
               end
               right do
-                template :box, :right, 'Hightlight der Woche'
+                box :right, 'Hightlight der Woche'
               end
             end
             border :bottom_left, :bottom_right
           end
         end
-        bottom do
-          template :box, :right, 'Sonstige Aufgaben'
+        split.bottom do
+          box :right, 'Sonstige Aufgaben'
         end
       end
     end

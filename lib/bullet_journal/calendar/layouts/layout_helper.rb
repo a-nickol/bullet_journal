@@ -1,14 +1,19 @@
 # frozen_string_literal: true
 
+require 'prawn/measurements'
+
 module BulletJournal
   ##
   # Contains methods for easier layouting pdf documents.
   #
   module LayoutHelper
+    include Colors
+    include Prawn::Measurements
 
-    def split_horizontal(position, options = {}, &block)
-      collector = Collector.new
-      collector.record_block(&block)
+    def split_horizontal(options = {}, &block)
+      position = options[:at] || 0
+
+      collector = Collector.new(&block)
       bounding_box([0, position], width: width, height: height - position) do
         collector.recorded_methods[:top].call
       end
@@ -17,9 +22,10 @@ module BulletJournal
       end
     end
 
-    def split_vertical(position, options = {}, &block)
-      collector = Collector.new
-      collector.record_block(&block)
+    def split_vertical(options = {}, &block)
+      position = options[:at] || 0
+
+      collector = Collector.new(&block)
       bounding_box([0, 0], width: position) do
         collector.recorded_methods[:left].call
       end
@@ -30,25 +36,29 @@ module BulletJournal
 
     def dotted_background
       fill_color GRAY
-      x = 0
-      while x < bounds.width
-        y = 0
-        while y < bounds.height
+      distance = mm2pt(5)
+      0.step(bounds.width, distance) do |x|
+        0.step(bounds.height, distance) do |y|
           fill_circle [x, y], 0.5
-          y += 5.mm
         end
-        x += 5.mm
       end
       fill_color BLACK
     end
 
-    def create_grid(x, y)
+    def create_grid(x, y, &block)
+      width = bounds.width / x
+      height = bounds.height / y
       x.times do |i|
         y.times do |j|
-          bounding_box([bounds.width / x * i, bounds.height / y * (j + 1)], width: bounds.width / x, height: bounds.height / y) do
-            yield i, j
-          end
+          create_grid_item i, j, width, height, &block
         end
+      end
+    end
+
+    def create_grid_item(i, j, width, height)
+      position = [width * i, height * (j + 1)]
+      bounding_box(position, width: width, height: height) do
+        yield i, j
       end
     end
   end
