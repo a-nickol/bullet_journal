@@ -24,7 +24,7 @@ module BulletJournal
   class LandscapeVertical < Calendar
     include LayoutHelper
 
-    HEADER_POSITION = 100
+    HEADER_POSITION = 50
 
     def day
       indent 5 do
@@ -33,7 +33,7 @@ module BulletJournal
         formatted_text_box [{ text: (current_date.strftime '%d').to_s, styles: [:bold] },
                             { text: " #{current_date.dayname}", size: 8 },
                             { text: feiertag, size: 6, styles: [:italic] }]
-      end
+        e     end
 
       create_grid 3, 4 do |x, y|
         index = (y + (2 - x) * 4)
@@ -54,29 +54,20 @@ module BulletJournal
 
     def header(orientation)
       stroke_color GRAY
-      stroke_horizontal_line 0, width, at: HEADER_POSITION
+      border :bottom_left, :bottom_right
 
       date = @current_week[0]
 
       stroke_color BLACK
       if orientation == :left
-        text_box "#{date.year} #{month_name(date)}", at: [0, HEADER_POSITION + 20],
-          width: width, align: :left,
+        text_box "#{date.year} #{month_name(date)}", at: [0, 20],
+          width: width, align: orientation,
           style: :bold
       else
-        text_box "#{month_name(date)} #{date.year}", at: [0, HEADER_POSITION + 20],
-          width: width, align: :right,
+        text_box "#{month_name(date)} #{date.year}", at: [0, 20],
+          width: width, align: orientation,
           style: :bold
       end
-    end
-
-    def box(orientation, text)
-      font_size 9
-      text_box text, at: [0, 0], width: width, heigth: height, align: orientation
-    end
-
-    def border(from, to)
-      stroke_line bounds.send(from), bounds.send(to)
     end
 
     def layout_left_page
@@ -125,20 +116,21 @@ module BulletJournal
         split.bottom do
           split_horizontal percent: 50 do |split|
             split.top do
-              split_vertical percent: 50
-              left do
-                box :left, 'Ziel der Woche'
-                border :top_right, :bottom_right
+              split_vertical percent: 50 do |split|
+                split.left do
+                  box :left, 'Ziel der Woche'
+                  border :top_right, :bottom_right
+                end
+                split.right do
+                  box :right, 'Hightlight der Woche'
+                end
               end
-              right do
-                box :right, 'Hightlight der Woche'
-              end
+              border :bottom_left, :bottom_right
             end
-            border :bottom_left, :bottom_right
+            split.bottom do
+              box :right, 'Sonstige Aufgaben'
+            end
           end
-        end
-        split.bottom do
-          box :right, 'Sonstige Aufgaben'
         end
       end
     end

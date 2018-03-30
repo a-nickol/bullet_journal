@@ -10,27 +10,42 @@ module BulletJournal
     include Colors
     include Prawn::Measurements
 
-    def split_horizontal(options = {}, &block)
-      position = options[:at] || 0
+    def split_horizontal(options, &block)
+      top_height = extract_position(options, height)
+      bottom_height = height - top_height
 
       collector = Collector.new(&block)
-      bounding_box([0, position], width: width, height: height - position) do
-        collector.recorded_methods[:top].call
-      end
-      bounding_box([0, 0], width: width, height: position) do
-        collector.recorded_methods[:bottom].call
+      split_horizontal_box(height, top_height, collector, :top)
+      split_horizontal_box(bottom_height, bottom_height, collector, :bottom)
+    end
+
+    def split_horizontal_box(y_position, box_height, collector, method)
+      bounding_box([0, y_position], width: width, height: box_height) do
+        collector.recorded_methods[method].call
       end
     end
 
-    def split_vertical(options = {}, &block)
-      position = options[:at] || 0
+    def split_vertical(options, &block)
+      left_width = extract_position(options, width)
+      right_width = width - left_width
 
       collector = Collector.new(&block)
-      bounding_box([0, 0], width: position) do
-        collector.recorded_methods[:left].call
+      split_vertical_box(0, left_width, collector, :left)
+      split_vertical_box(left_width, right_width, collector, :right)
+    end
+
+    def split_vertical_box(x_position, box_width, collector, method)
+      bounding_box([x_position, 0], width: box_width, height: height) do
+        collector.recorded_methods[method].call
       end
-      bounding_box([position, 0], width: width - position) do
-        collector.recorded_methods[:right].call
+    end
+
+    def extract_position(options, full)
+      percent = options[:percent]
+      if percent
+        full * percent / 100
+      else
+        options[:at] || 0
       end
     end
 
@@ -43,6 +58,11 @@ module BulletJournal
         end
       end
       fill_color BLACK
+    end
+
+    def background(color)
+      fill_color color
+      fill_rectangle(bounds.top_left, width, height)
     end
 
     def create_grid(x, y, &block)
@@ -59,6 +79,18 @@ module BulletJournal
       position = [width * i, height * (j + 1)]
       bounding_box(position, width: width, height: height) do
         yield i, j
+      end
+    end
+
+    def box(orientation, text)
+      font_size 9
+      text text
+    end
+
+    def border(first_point, *points)
+      stroke do
+        move_to(bounds.send(first_point))
+        points.each { |to| line_to(bounds.send(to)) }
       end
     end
   end

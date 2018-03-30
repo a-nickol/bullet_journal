@@ -32,7 +32,7 @@ module BulletJournal
     end
 
     def build_left_page
-      start_new_page
+      start_new_page if page_count > 1
       layout_left_page
     end
 
