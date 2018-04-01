@@ -14,5 +14,5 @@ require 'bullet_journal/calendar/tasks'
 require 'bullet_journal/calendar/calendar'
 
 require 'bullet_journal/calendar/layouts/layout_helper'
-require 'bullet_journal/calendar/layouts/landscape_vertical'
+require 'bullet_journal/calendar/layouts/landscape_horizontal'
 require 'bullet_journal/calendar/layouts/collector'

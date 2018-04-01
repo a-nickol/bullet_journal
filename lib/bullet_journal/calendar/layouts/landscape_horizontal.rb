@@ -3,7 +3,7 @@
 module BulletJournal
   ##
   # This layout is specially designed for left handed writers. The bullet journal
-  # is used in "landscape mode" with a split design. There are vertical fields on
+  # is used in "landscape mode" with a split design. There are horizontal fields on
   # the left, for each day of the week one field. On the right there are fields for
   # notetaking, future planing and motivation.
   #
@@ -21,7 +21,7 @@ module BulletJournal
   # |   friday   |             |
   # x--------------------------x
   #
-  class LandscapeVertical < Calendar
+  class LandscapeHorizontal < Calendar
     include LayoutHelper
 
     HEADER_POSITION = 50
