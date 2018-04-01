@@ -7,7 +7,7 @@ module BulletJournal
       'Roboto' => {
         normal: "#{DIR}/Roboto-Regular.ttf",
         bold: "#{DIR}/Roboto-Bold.ttf",
-        italic: "#{DIR}/Roboto-Italic.ttf2"
+        italic: "#{DIR}/Roboto-Italic.ttf"
       }
     }.freeze
   end

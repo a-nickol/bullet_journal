@@ -37,8 +37,8 @@ module BulletJournal
 
       grid 3, 4 do |x, y|
         index = (y + (2 - x) * 4)
-        if @todos[current_date]
-          todo = @todos[current_date][index]
+        if @tasks[date]
+          todo = @tasks[date][index]
           if todo
             stroke_circle [0, 19], 3
             indent 15 do
@@ -49,7 +49,7 @@ module BulletJournal
       end
 
       stroke_color GRAY
-      stroke_horizontal_line 0, bounds.width, at: 5 if i != 4
+      stroke_horizontal_line 0, bounds.width, at: 5
     end
 
     def layout_left_page
