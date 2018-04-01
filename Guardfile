@@ -7,7 +7,7 @@ group :red_green_refactor, halt_on_fail: true do
     watch(%r{^test/test_helper\.rb$})      { 'test' }
   end
 
-  guard :rubocop, cli: '--cache false' do
+  guard :rubocop, cli: '--auto-correct --cache false' do
     watch(/.+\.rb$/)
     watch(/.+\.gemspec$/)
     watch(%r{(?:.+/)?\.rubocop(?:_todo)?\.yml$}) { |m| File.dirname(m[0]) }

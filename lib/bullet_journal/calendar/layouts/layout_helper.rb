@@ -20,8 +20,10 @@ module BulletJournal
     end
 
     def split_horizontal_box(y_position, box_height, collector, method)
+      block = collector.recorded_methods[method]
+      return unless block
       bounding_box([0, y_position], width: width, height: box_height) do
-        collector.recorded_methods[method].call
+        block.call
       end
     end
 
@@ -35,8 +37,10 @@ module BulletJournal
     end
 
     def split_vertical_box(x_position, box_width, collector, method)
-      bounding_box([x_position, 0], width: box_width, height: height) do
-        collector.recorded_methods[method].call
+      block = collector.recorded_methods[method]
+      return unless block
+      bounding_box([x_position, height], width: box_width, height: height) do
+        block.call
       end
     end
 
@@ -65,26 +69,26 @@ module BulletJournal
       fill_rectangle(bounds.top_left, width, height)
     end
 
-    def create_grid(x, y, &block)
+    def grid(x, y, &block)
       width = bounds.width / x
       height = bounds.height / y
       x.times do |i|
         y.times do |j|
-          create_grid_item i, j, width, height, &block
+          grid_item i, j, width, height, &block
         end
       end
     end
 
-    def create_grid_item(i, j, width, height)
+    def grid_item(i, j, width, height)
       position = [width * i, height * (j + 1)]
       bounding_box(position, width: width, height: height) do
         yield i, j
       end
     end
 
-    def box(orientation, text)
+    def box(orientation, txt)
       font_size 9
-      text text
+      pad(5) { text txt, align: orientation }
     end
 
     def border(first_point, *points)

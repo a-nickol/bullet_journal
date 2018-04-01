@@ -11,7 +11,7 @@ module BulletJournal
     desc 'calendar YEAR QUARTER', 'creates a printable bullet journal calendar'
     def calendar(year, quarter, options = {})
       layout = options[:layout] || :landscape_vertical
-      filename = options[:filename] || 'calender.pdf'
+      filename = options[:filename] || 'calendar.pdf'
 
       (start_date, end_date) = calculate_interval year, quarter
 

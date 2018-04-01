@@ -26,16 +26,16 @@ module BulletJournal
 
     HEADER_POSITION = 50
 
-    def day
+    def layout_day date
       indent 5 do
         feiertag = ''
-        feiertag = ' Feiertag' if current_date.holiday?(:de_he)
-        formatted_text_box [{ text: (current_date.strftime '%d').to_s, styles: [:bold] },
-                            { text: " #{current_date.dayname}", size: 8 },
+        feiertag = ' Feiertag' if holiday?(date)
+        formatted_text_box [{ text: (date.strftime '%d').to_s, styles: [:bold] },
+                            { text: " #{wday_name(date)}", size: 8 },
                             { text: feiertag, size: 6, styles: [:italic] }]
-        e     end
+      end
 
-      create_grid 3, 4 do |x, y|
+      grid 3, 4 do |x, y|
         index = (y + (2 - x) * 4)
         if @todos[current_date]
           todo = @todos[current_date][index]
@@ -50,24 +50,6 @@ module BulletJournal
 
       stroke_color GRAY
       stroke_horizontal_line 0, bounds.width, at: 5 if i != 4
-    end
-
-    def header(orientation)
-      stroke_color GRAY
-      border :bottom_left, :bottom_right
-
-      date = @current_week[0]
-
-      stroke_color BLACK
-      if orientation == :left
-        text_box "#{date.year} #{month_name(date)}", at: [0, 20],
-          width: width, align: orientation,
-          style: :bold
-      else
-        text_box "#{month_name(date)} #{date.year}", at: [0, 20],
-          width: width, align: orientation,
-          style: :bold
-      end
     end
 
     def layout_left_page
@@ -132,6 +114,24 @@ module BulletJournal
             end
           end
         end
+      end
+    end
+
+    def header(orientation)
+      stroke_color GRAY
+      border :bottom_left, :bottom_right
+
+      date = @current_week[0]
+
+      stroke_color BLACK
+      if orientation == :left
+        text_box "#{date.year} #{month_name(date)}", at: [0, 20],
+          width: width, align: orientation,
+          style: :bold
+      else
+        text_box "#{month_name(date)} #{date.year}", at: [0, 20],
+          width: width, align: orientation,
+          style: :bold
       end
     end
   end
