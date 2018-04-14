@@ -1,5 +1,2 @@
-AllCops:
-  Exclude:
-    - 'lib/bullet_journal/calendar/layouts/landscape_vertical.rb'
 Layout/EndOfLine:
   EnforcedStyle: lf

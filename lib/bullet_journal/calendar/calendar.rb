@@ -65,6 +65,11 @@ module BulletJournal
       true
     end
 
+    def month_overview(date, x, y, width, height)
+      m = MonthOverview.new(@document, date)
+      m.print(x, y, width, height)
+    end
+
     private
 
     def initialize_pdf_document

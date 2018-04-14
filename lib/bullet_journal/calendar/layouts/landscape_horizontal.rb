@@ -26,7 +26,7 @@ module BulletJournal
 
     HEADER_POSITION = 50
 
-    def layout_day date
+    def layout_day(date)
       indent 5 do
         feiertag = ''
         feiertag = ' Feiertag' if holiday?(date)
@@ -117,22 +117,33 @@ module BulletJournal
       end
     end
 
+    def header_text(orientation, date)
+      if orientation == :left
+        "#{date.year} #{month_name(date)}"
+      else
+        "#{month_name(date)} #{date.year}"
+      end
+    end
+
     def header(orientation)
       stroke_color GRAY
       border :bottom_left, :bottom_right
 
       date = @current_week[0]
+      x = if orientation == :left
+            width - 100
+          else
+            0
+          end
+
+      month_overview(date, x, 0, 100, 70)
 
       stroke_color BLACK
-      if orientation == :left
-        text_box "#{date.year} #{month_name(date)}", at: [0, 20],
-          width: width, align: orientation,
-          style: :bold
-      else
-        text_box "#{month_name(date)} #{date.year}", at: [0, 20],
-          width: width, align: orientation,
-          style: :bold
-      end
+
+      text = header_text(orientation, date)
+      text_box text, at: [0, 20],
+                     width: width, align: orientation,
+                     style: :bold
     end
   end
 end
