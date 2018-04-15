@@ -130,13 +130,15 @@ module BulletJournal
       border :bottom_left, :bottom_right
 
       date = @current_week[0]
-      x = if orientation == :left
-            width - 100
-          else
-            0
-          end
+      month = date
+      if orientation == :left
+        x = width - 100
+      else
+        x = 0
+        month = month >> 1
+      end
 
-      month_overview(date, x, 0, 100, 70)
+      month_overview(month, date, x, 0, 100, 70)
 
       stroke_color BLACK
 

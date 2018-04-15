@@ -65,8 +65,8 @@ module BulletJournal
       true
     end
 
-    def month_overview(date, x, y, width, height)
-      m = MonthOverview.new(@document, date)
+    def month_overview(date, highlight, x, y, width, height)
+      m = MonthOverview.new(@document, date, highlight: highlight)
       m.print(x, y, width, height)
     end
 
