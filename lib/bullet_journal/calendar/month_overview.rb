@@ -16,26 +16,18 @@ module BulletJournal
     def initialize(doc, date, options = {})
       @document = doc
       @highlight = options[:highlight]
-      @start_date = calc_start_date(date)
-      @end_date = calc_end_date(date)
+      @start_date = first_day_of_month(date)
+      @end_date = last_day_of_month(date)
       @weeks = calc_weeks(@start_date, @end_date)
     end
 
-    def print(x, y, width, height)
-      bounding_box [x, y + height], width: width, height: height do
+    def print(pos, width, height)
+      bounding_box [pos[0], pos[1] + height], width: width, height: height do
         print_calendar
       end
     end
 
     private
-
-    def calc_start_date(date)
-      Date.new(date.year, date.month, 1)
-    end
-
-    def calc_end_date(date)
-      Date.new(date.year, date.month, -1)
-    end
 
     def calc_weeks(start_date, end_date)
       weeks = 1
@@ -59,24 +51,31 @@ module BulletJournal
           print_month_name
         end
         split.bottom do
-          print_week_names
-          (@start_date..@end_date).group_by(&:cweek).each_with_index do |week, i|
-            x = i + 1
-            w = week[1]
-            date = w.first
-            print_week_number(x, date)
-            highlight_week(x) if highlight?(date)
-            w.each do |day|
-              print_date(x, day)
-            end
-          end
+          print_calendar_body
         end
+      end
+    end
+
+    def print_calendar_body
+      print_week_names
+      (@start_date..@end_date).group_by(&:cweek).each_with_index do |week, i|
+        print_cweek(week[1], i)
       end
     end
 
     def position(x, y)
       y_offset = height / 7 * y
       [cell_width * x, height - y_offset]
+    end
+
+    def print_cweek(week, i)
+      x = i + 1
+      date = week.first
+      print_week_number(x, date)
+      highlight_week(x) if highlight?(date)
+      week.each do |day|
+        print_date(x, day)
+      end
     end
 
     def print_week_number(x, date)
@@ -123,14 +122,6 @@ module BulletJournal
 
     def highlight?(date)
       !@highlight.nil? && (@highlight.cweek == date.cweek)
-    end
-
-    def width
-      bounds.width
-    end
-
-    def height
-      bounds.height
     end
   end
 end

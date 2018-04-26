@@ -2,10 +2,10 @@
 
 module BulletJournal
   ##
-  # This layout is specially designed for left handed writers. The bullet journal
-  # is used in "landscape mode" with a split design. There are horizontal fields on
-  # the left, for each day of the week one field. On the right there are fields for
-  # notetaking, future planing and motivation.
+  # This layout is specially designed for left handed writers. The bullet
+  # journal is used in "landscape mode" with a split design. There are
+  # horizontal fields on the left, for each day of the week one field.
+  # On the right there are fields for notetaking, future planing and motivation.
   #
   # x--------------------------x
   # |   header   |    header   |
@@ -22,19 +22,25 @@ module BulletJournal
   # x--------------------------x
   #
   class LandscapeHorizontal < Calendar
-    include LayoutHelper
-
     HEADER_POSITION = 50
 
     def layout_day(date)
+      layout_day_header(date)
+      layout_day_body(date)
+    end
+
+    def layout_day_header(date)
       indent 5 do
         feiertag = ''
         feiertag = ' Feiertag' if holiday?(date)
-        formatted_text_box [{ text: (date.strftime '%d').to_s, styles: [:bold] },
+        formatted_text_box [{ text: (date.strftime '%d').to_s,
+                              styles: [:bold] },
                             { text: " #{wday_name(date)}", size: 8 },
                             { text: feiertag, size: 6, styles: [:italic] }]
       end
+    end
 
+    def layout_day_body(date)
       grid 3, 4 do |x, y|
         index = (y + (2 - x) * 4)
         if @tasks[date]
@@ -130,6 +136,17 @@ module BulletJournal
       border :bottom_left, :bottom_right
 
       date = @current_week[0]
+      header_month_overview(orientation, date)
+
+      stroke_color BLACK
+
+      text = header_text(orientation, date)
+      text_box text, at: [0, 20],
+                     width: width, align: orientation,
+                     style: :bold
+    end
+
+    def header_month_overview(orientation, date)
       month = date
       if orientation == :left
         x = width - 100
@@ -138,14 +155,7 @@ module BulletJournal
         month = month >> 1
       end
 
-      month_overview(month, date, x, 0, 100, 70)
-
-      stroke_color BLACK
-
-      text = header_text(orientation, date)
-      text_box text, at: [0, 20],
-                     width: width, align: orientation,
-                     style: :bold
+      month_overview(month, date, [x, 0], 100, 70)
     end
   end
 end

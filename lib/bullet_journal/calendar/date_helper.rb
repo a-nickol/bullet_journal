@@ -31,5 +31,13 @@ module BulletJournal
     def wday_name(date)
       WDAY_NAMES[date.wday]
     end
+
+    def first_day_of_month(date)
+      Date.new(date.year, date.month, 1)
+    end
+
+    def last_day_of_month(date)
+      Date.new(date.year, date.month, -1)
+    end
   end
 end

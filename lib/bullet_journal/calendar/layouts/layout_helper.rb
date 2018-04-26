@@ -97,5 +97,13 @@ module BulletJournal
         points.each { |to| line_to(bounds.send(to)) }
       end
     end
+
+    def width
+      bounds.width
+    end
+
+    def height
+      bounds.height
+    end
   end
 end

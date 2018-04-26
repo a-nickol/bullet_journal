@@ -3,8 +3,13 @@
 
 require 'bullet_journal'
 
+def quartal(month)
+  ((month - 1) / 4) + 1
+end
+
 if ARGV.empty?
-  BulletJournal::CLI.new.calendar 2018, 1
+  date = Date.today
+  BulletJournal::CLI.new.calendar(date.year, quartal(date.month))
 else
   BulletJournal::CLI.start
 end

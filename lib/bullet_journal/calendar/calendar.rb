@@ -11,6 +11,7 @@ module BulletJournal
     include Prawn::View
     include Colors
     include DateHelper
+    include LayoutHelper
 
     def initialize(start_date, end_date)
       initialize_pdf_document
@@ -65,9 +66,9 @@ module BulletJournal
       true
     end
 
-    def month_overview(date, highlight, x, y, width, height)
+    def month_overview(date, highlight, pos, width, height)
       m = MonthOverview.new(@document, date, highlight: highlight)
-      m.print(x, y, width, height)
+      m.print(pos, width, height)
     end
 
     private
@@ -108,14 +109,6 @@ module BulletJournal
         reorder_dates.push(*slice[0..3])
       end
       @dates = reorder_dates
-    end
-
-    def width
-      bounds.width
-    end
-
-    def height
-      bounds.height
     end
   end
 end
