@@ -74,15 +74,15 @@ module BulletJournal
       height = bounds.height / y
       x.times do |i|
         y.times do |j|
-          grid_item i, j, width, height, &block
+          grid_item x, y, i, j, width, height, &block
         end
       end
     end
 
-    def grid_item(i, j, width, height)
+    def grid_item(x, y, i, j, width, height)
       position = [width * i, height * (j + 1)]
       bounding_box(position, width: width, height: height) do
-        yield i, j
+        yield i, y - j - 1
       end
     end
 

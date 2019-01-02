@@ -20,6 +20,14 @@ module BulletJournal
       calendar.save_as(filename)
     end
 
+    desc 'dotted_paper', 'creates a printable dotted paper'
+    def dotted_paper(options = {})
+      filename = options[:filename] || 'dotted_paper.pdf'
+
+      paper = DottedPaper.new
+      paper.save_as(filename)
+    end
+
     default_task :calendar
 
     private

@@ -1,1 +1,1 @@
-ruby -Ilib bin\bullet_journal.rb
+ruby -Ilib bin\bullet_journal.rb %*
