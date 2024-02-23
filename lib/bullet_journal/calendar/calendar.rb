@@ -63,7 +63,7 @@ module BulletJournal
     end
 
     def duplex_print?
-      true
+      false
     end
 
     def month_overview(date, highlight, pos, width, height)
